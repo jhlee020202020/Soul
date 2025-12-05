@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "Soul_game.sln"
+    "dotnet.defaultSolution": "Soul.sln"
 }
