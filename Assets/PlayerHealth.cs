@@ -4,50 +4,59 @@ using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour
 {
-    public float maxHealth = 100f;
-    public float currentHealth;
-    private Animator anim;
+    public int maxHealth = 100; // 최대 체력
+    private int currentHealth;   // 현재 체력
+    public Animator anim;        // 애니메이터
+    private bool isDead = false; // 죽음 상태
 
     void Start()
     {
-        // Animator 컴포넌트 할당 확인
-        anim = GetComponent<Animator>();
-        
-        // Animator가 제대로 할당되지 않은 경우 예외 처리
-        if (anim == null)
-        {
-            Debug.LogError("Animator component not found on this object!");
-        }
-
-        currentHealth = maxHealth;  // 체력 초기화
+        currentHealth = maxHealth;  // 게임 시작 시 체력 초기화
     }
 
     void Update()
     {
-        if (currentHealth <= 0f)
+        // 체력이 0 이하로 떨어지면 죽음 애니메이션 실행
+        if (currentHealth <= 0 && !isDead)
         {
             Die();
         }
     }
 
-    public void TakeDamage(float damage)
+    // 데미지 받는 함수
+    public void TakeDamage(int damage)
     {
-        if (currentHealth <= 0) return; // 이미 죽었으면 데미지 받지 않음
+        if (isDead) return;  // 이미 죽었으면 더 이상 데미지를 받지 않음
 
-        currentHealth -= damage; // 데미지 받으면 체력 감소
-        if (currentHealth < 0) currentHealth = 0;
-        Debug.Log("Current Health: " + currentHealth);  // 체력 로그 출력
+        currentHealth -= damage;
+        if (currentHealth < 0)
+        {
+            currentHealth = 0;
+        }
     }
 
-    void Die()
+    // 죽을 때 호출되는 함수
+    private void Die()
     {
-        if (anim != null)
-        {
-            anim.SetTrigger("Die"); // 'Die' 트리거 활성화
-        }
+        isDead = true;
+        anim.SetTrigger("Die");  // 죽음 애니메이션 트리거
+        // 죽음 애니메이션 끝나면 아무 동작도 하지 않도록 처리
+    }
 
-        // 추가적으로 플레이어가 죽을 때 필요한 처리를 해줍니다.
-        // 예: 이동 비활성화, 공격 비활성화 등.
-        GetComponent<PlayerMovement>().enabled = false;  // 예: 이동 비활성화
+    // 죽음 애니메이션이 끝난 후 호출되는 함수 (애니메이션 이벤트에서 호출)
+    public void OnDeathAnimationEnd()
+    {
+        // 죽은 후 더 이상 아무것도 하지 않도록 설정
+        // 예를 들어, 게임 오버 화면을 표시할 수도 있음
+        Debug.Log("Player died. Game over.");
+    }
+
+    // 플레이어 초기화 함수 (게임 리로드 후 호출)
+    public void InitializePlayer()
+    {
+        isDead = false;  // 죽지 않은 상태로 초기화
+        currentHealth = maxHealth;  // 체력 초기화
+        anim.SetTrigger("Respawn");  // 리스폰 애니메이션 트리거
     }
 }
+
