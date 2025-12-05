@@ -43,6 +43,9 @@ public class DragonAI : MonoBehaviour
 
         float distance = Vector3.Distance(transform.position, player.position);
 
+        // ============================
+        // 공격 애니메이션 도중
+        // ============================
         if (isAttacking)
         {
             agent.isStopped = true;
@@ -51,6 +54,9 @@ public class DragonAI : MonoBehaviour
             return;
         }
 
+        // ============================
+        // 공격 준비 중
+        // ============================
         if (isWaiting)
         {
             agent.isStopped = true;
@@ -59,6 +65,9 @@ public class DragonAI : MonoBehaviour
             return;
         }
 
+        // ============================
+        // 공격 후 쿨타임
+        // ============================
         if (isCoolingDown)
         {
             agent.isStopped = true;
@@ -67,18 +76,27 @@ public class DragonAI : MonoBehaviour
             return;
         }
 
+        // ============================
+        // 🌀 Dash 조건
+        // ============================
         if (distance > dashDistance && dashAvailable && !isDashing)
         {
             StartCoroutine(DoDash());
             return;
         }
 
+        // ============================
+        // 공격 거리
+        // ============================
         if (distance <= attackDistance)
         {
             StartCoroutine(PrepareAndAttack());
             return;
         }
 
+        // ============================
+        // 추적
+        // ============================
         if (distance <= chaseDistance)
         {
             ChasePlayer();
@@ -90,6 +108,9 @@ public class DragonAI : MonoBehaviour
         }
     }
 
+    // ======================
+    // 플레이어 바라보기
+    // ======================
     void LookAtPlayer()
     {
         Vector3 dir = player.position - transform.position;
@@ -100,6 +121,9 @@ public class DragonAI : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, rot, Time.deltaTime * rotationSpeed);
     }
 
+    // ======================
+    // Chase
+    // ======================
     void ChasePlayer()
     {
         if (isDashing) return;
@@ -109,6 +133,9 @@ public class DragonAI : MonoBehaviour
         agent.SetDestination(player.position);
     }
 
+    // ======================
+    // 공격 준비 → 공격
+    // ======================
     IEnumerator PrepareAndAttack()
     {
         if (isWaiting || isAttacking || isCoolingDown)
@@ -128,6 +155,9 @@ public class DragonAI : MonoBehaviour
         anim.SetTrigger("Attack");
     }
 
+    // ======================
+    // 공격 종료
+    // ======================
     public void OnAttackEnd()
     {
         StopFireBreath(); 
@@ -142,6 +172,9 @@ public class DragonAI : MonoBehaviour
         isCoolingDown = false;
     }
 
+    // ======================
+    // Dash 기능
+    // ======================
     IEnumerator DoDash()
     {
         dashAvailable = false;
@@ -160,7 +193,9 @@ public class DragonAI : MonoBehaviour
         dashAvailable = true;
     }
 
-    // 🔥 브레스 시작
+    // ======================
+    // 🔥 불 브레스 시작 (Animation Event)
+    // ======================
     public void StartFireBreath()
     {
         if (fireBreathFX == null) return;
@@ -171,7 +206,9 @@ public class DragonAI : MonoBehaviour
         StartCoroutine(FireDamageLoop());
     }
 
-    // 🔥 브레스 종료
+    // ======================
+    // 🔥 불 브레스 종료 (Animation Event)
+    // ======================
     public void StopFireBreath()
     {
         if (fireBreathFX == null) return;
@@ -180,7 +217,9 @@ public class DragonAI : MonoBehaviour
         isBreathingFire = false;
     }
 
+    // ======================
     // 🔥 불 데미지 반복 적용
+    // ======================
     IEnumerator FireDamageLoop()
     {
         PlayerHealth hp = player.GetComponent<PlayerHealth>(); // 🔥 추가된 코드
@@ -201,10 +240,3 @@ public class DragonAI : MonoBehaviour
         }
     }
 }
-
-
-
-
-
-
-
